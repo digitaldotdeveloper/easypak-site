@@ -72,6 +72,13 @@ a{ color:inherit; text-decoration:none; }
 }
 @keyframes kb{ from{ transform:scale(1.02); } to{ transform:scale(1.085); } }
 
+/* Every wallpaper is composed with its subject centre-right and the left third
+   left calm, because that is where the card sits. In Arabic the card mirrors to
+   the right, so the photograph mirrors with it. */
+html[dir="rtl"] .wall figure{ transform:scale(1.02) scaleX(-1); }
+html[dir="rtl"] .wall figure.on{ animation-name:kb-rtl; }
+@keyframes kb-rtl{ from{ transform:scale(1.02) scaleX(-1); } to{ transform:scale(1.085) scaleX(-1); } }
+
 .wall-veil{
   position:fixed; inset:0; z-index:1; pointer-events:none;
   background:
@@ -396,4 +403,5 @@ html[dir="rtl"] .arrow svg{ transform:scaleX(-1); }
 @media (prefers-reduced-motion:reduce){
   *{ animation-duration:.01ms !important; transition-duration:.01ms !important; }
   .wall figure.on{ animation:none; transform:scale(1.06); }
+  html[dir="rtl"] .wall figure.on{ transform:scale(1.06) scaleX(-1); }
 }

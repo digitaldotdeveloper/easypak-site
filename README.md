@@ -1,5 +1,7 @@
 # EasyPak Trading Co. — website renovation
 
+**Live preview: <https://digitaldotdeveloper.github.io/easypak-site/>**
+
 A one-screen redesign of [easypaksa.com](https://easypaksa.com), built the way
 [wetransfer.com](https://wetransfer.com) works: a full-bleed photograph behind a single
 floating card that carries the whole site. **The page never scrolls.**
@@ -34,17 +36,38 @@ app.js            content, both languages, view rendering, wallpaper engine
 assets/wall/      six wallpapers
 assets/products/  twelve catalogue images
 assets/logo.png   the EasyPak wordmark
+_gen/             the image recipe (prompts + the script that renders them)
+tools/shot.js     CDP screenshots at true device sizes
 ```
 
 All copy and both languages live in the `STR` object at the top of `app.js`; the catalogue
 lives in `PRODUCTS` and the wallpapers in `WALLS`. Nothing else needs touching to add a
 product or change a sentence.
 
+## The images
+
+Every photograph on the page is rendered in the in-house Gemini Studio, from the eighteen
+prompts in `_gen/jobs.json`. They sit behind three shared style spines — one studio spine the
+twelve catalogue shots share so the set reads as one shoot, and two location spines for the
+wallpapers — which is the whole reason the catalogue grid looks even.
+
+```
+GS_TOKEN=… node _gen/gen.mjs         render anything missing from _gen/out/
+python _gen/ship.py [name,name]      crop, resize and write assets/
+```
+
+`gen.mjs` skips whatever is already in `_gen/out/`, so it doubles as the retry pass: delete
+the one frame you dislike, re-run, re-ship. Gemini caps the long edge at 1024 px, so
+`ship.py` crops the products to the 3:2 their tile wants and takes the wallpapers to
+1920 × 1080 with Lanczos and a light unsharp — they run full-bleed under a ken-burns zoom,
+where the native size visibly softens.
+
 ## Deploying
 
-The repository is static, so GitHub Pages serves it as-is from the default branch.
-To put it on the real domain instead, drop the folder into the web root — or add a `CNAME`
-file containing `easypaksa.com` and point the DNS at GitHub Pages.
+The repository is static, so GitHub Pages serves it as-is from `main` — that is what
+<https://digitaldotdeveloper.github.io/easypak-site/> is. To put it on the real domain
+instead, drop the folder into the web root — or add a `CNAME` file containing
+`easypaksa.com` and point the DNS at GitHub Pages.
 
 ## Credit
 
