@@ -185,7 +185,7 @@ const T  = () => STR[lang];
    old photographs for ten minutes or more - long enough to look like a deploy
    that did not work. Bump V on every deploy; index.html carries the same token
    on styles.css, app.js and the logo. */
-const V = '5';
+const V = '6';
 const v = url => `${url}?v=${V}`;
 
 /* ── wallpaper engine ───────────────────────────────────── */

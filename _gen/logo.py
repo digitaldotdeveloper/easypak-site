@@ -18,7 +18,8 @@ from PIL import Image
 
 SRC = Path.home() / "Desktop" / "EasyPak Logo.png"
 ASSETS = Path(__file__).resolve().parent.parent / "assets"
-PAD = 6          # px of breathing room kept around the mark
+PAD = 0          # cropped tight: the header aligns the mark's left edge to the
+                 # card below it, so any transparent padding reads as an indent
 FLOOR = 0.02     # anything fainter than this is the 254-grey plate, not the mark
 
 # sampled off easypaksa.com's own 02-groups-logos.png so the knockout matches

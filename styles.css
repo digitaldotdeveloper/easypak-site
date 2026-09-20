@@ -369,7 +369,9 @@ a.crow:hover{ padding-inline-start:6px; }
 
 /* ── dock (bottom-left nav) ─────────────────────────────── */
 
-.dock{ grid-area:dock; display:flex; align-items:center; gap:4px; flex-wrap:wrap; }
+/* Centred under the card, which is the column this shares with it. */
+.dock{ grid-area:dock; display:flex; align-items:center; gap:4px; flex-wrap:wrap;
+       justify-content:center; justify-content:safe center; }
 .dock button{
   border:0; background:transparent; cursor:pointer; padding:7px 12px; border-radius:999px;
   font-size:13px; font-weight:600; color:rgba(255,255,255,.72);
@@ -426,7 +428,8 @@ html[dir="rtl"] .arrow svg{ transform:scaleX(-1); }
   .panel-body{ padding:20px 20px calc(22px + env(safe-area-inset-bottom)); }
   .h1{ font-size:22px; }
 
-  .dock{ overflow-x:auto; flex-wrap:nowrap; padding-bottom:4px; scrollbar-width:none; gap:7px; }
+  .dock{ overflow-x:auto; flex-wrap:nowrap; padding-bottom:4px; scrollbar-width:none; gap:7px;
+         justify-content:safe center; }
   .dock::-webkit-scrollbar{ display:none; }
   /* On the wide layout these are bare words in the margin. On a phone they sit in
      the middle of the photograph with nothing behind them, so they become chips. */
