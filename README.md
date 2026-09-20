@@ -25,7 +25,9 @@ else — catalogue, about, contact, FAQ — swaps into the same card instead of 
   and no backend to host. Email is offered underneath as the fallback.
 - **Bilingual EN / AR** with a full RTL mirror, including the wallpaper's light direction.
   The choice is remembered in `localStorage`.
-- **Mobile.** The card becomes a bottom sheet over the photograph; the page still does not scroll.
+- **Mobile.** The card is a **draggable bottom sheet**. It rests closed, so the photograph
+  has the screen, and snaps to three heights — closed, half, full — by drag, by flick, or by
+  tapping the grip. Reaching for a tab or the dock opens it. The page still does not scroll.
 
 ## Files
 
@@ -35,6 +37,7 @@ styles.css        the whole design system (colours sampled from the EasyPak logo
 app.js            content, both languages, view rendering, wallpaper engine
 assets/wall/      six wallpapers
 assets/products/  twelve catalogue images
+assets/share.jpg  the 1200x630 card that link previews show
 assets/logo.png   the wordmark, white knockout on transparent (for photography)
 assets/logo-dark.png  the same mark in brand colours, for light backgrounds
 _gen/             the image recipe (prompts + the script that renders them)
@@ -56,6 +59,7 @@ wallpapers — which is the whole reason the catalogue grid looks even.
 GS_TOKEN=… node _gen/gen.mjs         render anything missing from _gen/out/
 python _gen/ship.py [name,name]      crop, resize and write assets/
 python _gen/logo.py                  cut the wordmark off its white background
+python _gen/share.py                 redraw the link-preview card
 ```
 
 `gen.mjs` skips whatever is already in `_gen/out/`, so it doubles as the retry pass: delete
@@ -74,6 +78,16 @@ the bottom, so only the top 224 px of the wallpaper is ever visible — and that
 landscape. Covering the full 390 × 844 element cropped the 16:9 frame to a quarter of its
 width and enlarged it almost threefold, which is how a photograph of a pallet became a
 photograph of roof beams. On a phone the frame is now laid into that band whole.
+
+## The link preview
+
+`assets/share.jpg` is drawn by `_gen/share.py` — the mark, one line of what the company
+sells, and where it delivers, on the container photograph, which is the one that survives
+being shrunk to a chat thumbnail.
+
+The thing that actually stops a preview appearing is **a relative `og:image`**: every scraper
+drops it. The four absolute URLs in the head of `index.html` are the ones to change if this
+moves to easypaksa.com, along with `robots.txt` and `sitemap.xml`.
 
 ## Deploying
 

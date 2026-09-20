@@ -23,6 +23,8 @@
   --panel-w: 420px;
   --panel-w-wide: 780px;
   --gut: 36px;
+  --pad-card: 28px;     /* the card's inner gutter - the wordmark lines up with it */
+  --panel-bleed: 0px;   /* how far the card runs past the stage padding (phones only) */
 
   --shadow: 0 24px 60px -18px rgba(14,22,32,.45), 0 4px 14px rgba(14,22,32,.14);
   --ease: cubic-bezier(.22,.8,.28,1);
@@ -73,21 +75,13 @@ a{ color:inherit; text-decoration:none; }
 }
 @keyframes kb{ from{ transform:scale(1.02); } to{ transform:scale(1.085); } }
 
-/* On a phone the card is a sheet 620px tall pinned to the bottom, so only the top
-   224px of this element is ever seen - and that visible window is landscape, not
-   portrait. Covering the whole 390x844 element cropped the 16:9 frame to a
-   quarter of its width and enlarged it nearly threefold, which is how a
-   photograph of a pallet became a photograph of roof beams. So on a phone the
-   frame is laid into that band whole, at a little over full width, and the deep
-   slate of .wall fills everything underneath - which the sheet covers anyway. */
+/* The card rests closed on a phone, so the window onto the photograph is the
+   whole screen minus a 130px sheet - tall, not wide. Cropping the 16:9 frame to
+   fit that took a quarter of its width and enlarged it threefold, which is how
+   a photograph of a pallet became a photograph of roof beams. Portrait viewports
+   get a natively vertical cut of the same scene instead. */
 @media (max-aspect-ratio:4/5){
-  .wall figure{
-    background-size:108% auto;
-    background-position:center top;
-    background-repeat:no-repeat;
-    transform:none;
-  }
-  .wall figure.on{ animation:none; }
+  .wall figure{ background-image:var(--w-p); background-position:center 42%; }
 }
 
 /* Every landscape wallpaper is composed with its subject centre-right and the
@@ -121,10 +115,11 @@ html[dir="rtl"] .wall-veil{
 
 /* The Arabic mirror is a landscape-layout fix - it moves the subject away from a
    card that sits on one side. On a phone the sheet is at the bottom instead, so
-   there is nothing to move away from and flipping would only undo the framing. */
+   there is nothing to move away from, and flipping the portrait cut would only
+   undo its framing. */
 @media (max-aspect-ratio:4/5){
-  html[dir="rtl"] .wall figure{ transform:none; }
-  html[dir="rtl"] .wall figure.on{ animation:none; }
+  html[dir="rtl"] .wall figure{ transform:scale(1.02); }
+  html[dir="rtl"] .wall figure.on{ animation-name:kb; }
 }
 
 /* ── stage ──────────────────────────────────────────────── */
@@ -153,6 +148,8 @@ html[dir="rtl"] .wall-veil{
   /* The white knockout sits straight on the photograph - no plate. The shadow
      is what keeps it off a bright frame; the veil does the rest. */
   display:block; height:46px; width:auto;
+  /* Squared to the card's text column, not to its outer edge. */
+  margin-inline-start:calc(var(--pad-card) - var(--panel-bleed));
   filter:drop-shadow(0 2px 5px rgba(8,14,22,.55)) drop-shadow(0 8px 22px rgba(8,14,22,.35));
 }
 
@@ -196,6 +193,14 @@ html[dir="rtl"] .wall-veil{
   background:linear-gradient(to top, #fff 10%, rgba(255,255,255,0));
 }
 
+/* The sheet's grab handle. Hidden on the wide layout, where the card does not
+   move; a real <button> so it also works by tap and by keyboard. */
+.grip{ display:none; }
+.sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+
+/* The card's flex column moved in here when the grip became a sibling of it. */
+.panel-inner{ display:flex; flex-direction:column; flex:1 1 auto; min-height:0; overflow:hidden; }
+
 .panel-head{
   display:flex; gap:4px; padding:10px 10px 0; flex:0 0 auto;
   border-bottom:1px solid var(--line);
@@ -220,7 +225,7 @@ html[dir="rtl"] .head-plain{ padding:11px 20px 11px 11px; }
 html[dir="rtl"] .head-title{ letter-spacing:0; }
 
 .panel-body{
-  padding:22px 28px 30px;
+  padding:22px var(--pad-card) 30px;
   overflow-y:auto; overscroll-behavior:contain;
   flex:1 1 auto;
 }
@@ -405,13 +410,14 @@ html[dir="rtl"] .arrow svg{ transform:scaleX(-1); }
 }
 
 @media (max-width:900px){
-  :root{ --gut:18px; }
+  :root{ --gut:18px; --pad-card:20px; --panel-bleed:18px; }
   .stage{
     grid-template-columns:1fr;
-    grid-template-rows:auto 1fr auto auto;
-    grid-template-areas:"top" "." "dock" "panel";
+    grid-template-rows:auto 1fr auto;
+    grid-template-areas:"top" "." "dock";
     gap:12px;
-    padding:14px var(--gut) 0;
+    /* the dock sits just clear of the closed sheet */
+    padding:14px var(--gut) 146px;
   }
   .stage.wide{ grid-template-columns:1fr; }
 
@@ -419,13 +425,36 @@ html[dir="rtl"] .arrow svg{ transform:scaleX(-1); }
   .pill{ height:34px; padding:0 12px; font-size:12.5px; }
   .pill-ghost span{ display:none; }
 
+  /* ── the card becomes a draggable sheet ──────────────────
+     It is translated down by everything except --sheet-h, so --sheet-h IS the
+     height you can see. app.js writes both properties; the fallbacks here are
+     what the first paint uses, before it runs. */
   .panel{
-    max-height:min(74dvh, 620px);
+    position:fixed; left:0; right:0; bottom:0; top:auto;
+    width:auto; margin:0;
+    /* The dock follows the panel in the DOM and its chips carry backdrop-filter,
+       which makes each one a stacking context painting in the same layer as a
+       positioned element - so without this they sit on top of the sheet. */
+    z-index:4;
+    height:var(--sheet-full, min(92dvh, 720px));
+    max-height:none;
     border-radius:var(--r-lg) var(--r-lg) 0 0;
-    margin-inline:calc(var(--gut) * -1);
-    width:auto;
+    transform:translateY(calc(100% - var(--sheet-h, 118px)));
+    transition:transform .34s var(--ease);
+    will-change:transform;
   }
-  .panel-body{ padding:20px 20px calc(22px + env(safe-area-inset-bottom)); }
+  .panel.dragging{ transition:none; }
+  .panel::after{ display:none; }   /* the fade belongs to a card, not a sheet */
+
+  .grip{
+    display:flex; align-items:center; justify-content:center;
+    flex:0 0 auto; height:26px; padding:0; border:0; background:transparent;
+    cursor:grab; touch-action:none;
+  }
+  .grip:active{ cursor:grabbing; }
+  .grip i{ width:38px; height:4px; border-radius:99px; background:#d2d9e2; display:block; }
+  .panel-head{ touch-action:none; }
+  .panel-body{ padding:20px var(--pad-card) calc(22px + env(safe-area-inset-bottom)); }
   .h1{ font-size:22px; }
 
   .dock{ overflow-x:auto; flex-wrap:nowrap; padding-bottom:4px; scrollbar-width:none; gap:7px;
@@ -454,6 +483,7 @@ html[dir="rtl"] .arrow svg{ transform:scaleX(-1); }
 
 @media (prefers-reduced-motion:reduce){
   *{ animation-duration:.01ms !important; transition-duration:.01ms !important; }
+  .panel{ transition:none !important; }
   .wall figure.on{ animation:none; transform:scale(1.06); }
   html[dir="rtl"] .wall figure.on{ transform:scale(1.06) scaleX(-1); }
 }

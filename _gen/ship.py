@@ -2,9 +2,9 @@
 
 Gemini caps the long edge at 1024 px - asking for 2K or 4K in the prompt changes
 nothing, it was measured - so the only real lever on quality is to stop wasting
-those pixels on a crop.  That is a stylesheet job on the phone, where the frame
-is now laid into the visible band whole instead of being cropped to a quarter of
-its width; here it just means not resampling anything that does not need it.
+those pixels on a crop.  Hence two wallpaper sets: the 16:9 one for
+landscape viewports, and a natively vertical cut for phones, where the card is a
+sheet that rests closed and the window onto the photograph is tall.
 
 Products ship at their native size: the catalogue tile is ~190 px on desktop and
 ~165 px on a phone, so 1024 is already several times what any screen asks for and
@@ -49,16 +49,21 @@ def ship(name, kind):
     im = Image.open(src).convert("RGB")
     if kind == "product":
         im, dest, q = crop_to(im, 3 / 2), SITE / "assets" / "products" / f"{name}.jpg", 92
-    else:
+    elif kind == "wall":
         im = enlarge(crop_to(im, 16 / 9), (1920, 1080))
         dest, q = SITE / "assets" / "wall" / f"{name}.jpg", 86
+    else:
+        im = enlarge(crop_to(im, 9 / 16), (1012, 1800))
+        dest, q = SITE / "assets" / "wall" / f"{name}.jpg", 82
     dest.parent.mkdir(parents=True, exist_ok=True)
     im.save(dest, "JPEG", quality=q, optimize=True, progressive=True)
     print(f"  {name:10s} {im.size[0]}x{im.size[1]}  {dest.stat().st_size // 1024} KB")
 
 
 only = sys.argv[1].split(",") if len(sys.argv) > 1 else None
-plan = [(n, "product") for n in PRODUCTS] + [(n, "wall") for n in WALLS]
+plan = ([(n, "product") for n in PRODUCTS]
+        + [(n, "wall") for n in WALLS]
+        + [(n + "-p", "wall_p") for n in WALLS])
 for n, kind in plan:
     if not only or n in only:
         ship(n, kind)

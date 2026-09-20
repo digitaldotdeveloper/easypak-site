@@ -10,12 +10,12 @@ const EMAIL      = 'info@easypaksa.com';
 /* ── wallpapers ─────────────────────────────────────────── */
 
 const WALLS = [
-  { src:'assets/wall/w1.jpg', en:'Polypropylene strapping, palletised and ready to move.',      ar:'شرائط بولي بروبيلين معبّأة على منصات وجاهزة للشحن.' },
-  { src:'assets/wall/w4.jpg', en:'Steel-strapped pipe bundles, loaded for export.',             ar:'حزم أنابيب مربوطة بشرائط حديدية وجاهزة للتصدير.' },
-  { src:'assets/wall/w2.jpg', en:'PET coils staged for a Riyadh dispatch run.',                 ar:'لفات PET جاهزة لرحلة توزيع في الرياض.' },
-  { src:'assets/wall/w5.jpg', en:'Bundled pipe — the load that strapping is judged on.',        ar:'أنابيب مجمّعة — الحمولة التي تُختبر عليها جودة الشريط.' },
-  { src:'assets/wall/w3.jpg', en:'Machine-grade PP coils on a stretch-wrapped pallet.',         ar:'لفات PP لماكينات الربط على منصة ملفوفة بالستريتش.' },
-  { src:'assets/wall/w6.jpg', en:'Green PET strapping, racked at the Dammam branch.',           ar:'شرائط PET خضراء على رفوف فرع الدمام.' }
+  { src:'assets/wall/w1.jpg', srcP:'assets/wall/w1-p.jpg', en:'Polypropylene strapping, palletised and ready to move.',      ar:'شرائط بولي بروبيلين معبّأة على منصات وجاهزة للشحن.' },
+  { src:'assets/wall/w4.jpg', srcP:'assets/wall/w4-p.jpg', en:'Steel-strapped pipe bundles, loaded for export.',             ar:'حزم أنابيب مربوطة بشرائط حديدية وجاهزة للتصدير.' },
+  { src:'assets/wall/w2.jpg', srcP:'assets/wall/w2-p.jpg', en:'PET coils staged for a Riyadh dispatch run.',                 ar:'لفات PET جاهزة لرحلة توزيع في الرياض.' },
+  { src:'assets/wall/w5.jpg', srcP:'assets/wall/w5-p.jpg', en:'Bundled pipe — the load that strapping is judged on.',        ar:'أنابيب مجمّعة — الحمولة التي تُختبر عليها جودة الشريط.' },
+  { src:'assets/wall/w3.jpg', srcP:'assets/wall/w3-p.jpg', en:'Machine-grade PP coils on a stretch-wrapped pallet.',         ar:'لفات PP لماكينات الربط على منصة ملفوفة بالستريتش.' },
+  { src:'assets/wall/w6.jpg', srcP:'assets/wall/w6-p.jpg', en:'Green PET strapping, racked at the Dammam branch.',           ar:'شرائط PET خضراء على رفوف فرع الدمام.' }
 ];
 
 /* ── catalogue ──────────────────────────────────────────── */
@@ -185,7 +185,7 @@ const T  = () => STR[lang];
    old photographs for ten minutes or more - long enough to look like a deploy
    that did not work. Bump V on every deploy; index.html carries the same token
    on styles.css, app.js and the logo. */
-const V = '6';
+const V = '7';
 const v = url => `${url}?v=${V}`;
 
 /* ── wallpaper engine ───────────────────────────────────── */
@@ -205,7 +205,8 @@ function paintWall(i){
   const fig = $('#wall').children[i];
   if (!fig || fig.dataset.painted) return;
   fig.dataset.painted = '1';
-  fig.style.setProperty('--w', `url('${v(WALLS[i].src)}')`);
+  fig.style.setProperty('--w',   `url('${v(WALLS[i].src)}')`);
+  fig.style.setProperty('--w-p', `url('${v(WALLS[i].srcP)}')`);
 }
 
 function showWall(i){
@@ -383,12 +384,13 @@ function viewFaq(){
 const VIEWS = { quote:viewQuote, catalogue:viewCatalogue, about:viewAbout, contact:viewContact, faq:viewFaq };
 
 function render(){
-  $('#panel').innerHTML = VIEWS[view]();
+  $('#panelInner').innerHTML = VIEWS[view]();
   $('.stage').classList.toggle('wide', view === 'catalogue');
   renderChrome();
 }
 
 function go(next){
+  sheet.open();               // tapping a tab or the dock is a request to see it
   if (next === view) return;
   view = next;
   render();
@@ -457,7 +459,126 @@ document.addEventListener('click', e => {
   }
 });
 
-$('#panel').addEventListener('submit', e => { if (e.target.id === 'quoteForm') submitQuote(e); });
+$('#panelInner').addEventListener('submit', e => { if (e.target.id === 'quoteForm') submitQuote(e); });
+
+/* ── the bottom sheet (phones only) ─────────────────────── */
+/*
+   On a phone the card is a sheet you drag. It rests closed so the photograph
+   has the screen, and snaps to one of three heights. The stylesheet owns the
+   numbers - JS reads them back off the element rather than keeping its own
+   copy, so there is one place to change them.
+
+   Dragging starts on the grip and the tab row, and also on the body, but only
+   when the body is scrolled to the top and the finger is going down: otherwise
+   a downward swipe inside a scrolled list would close the sheet instead of
+   scrolling it, which is the thing that makes a sheet feel broken.
+*/
+const sheet = (() => {
+  const panel = $('#panel'), grip = $('#grip');
+  const isPhone = () => matchMedia('(max-width:900px)').matches;
+
+  // JS owns the three heights and writes --sheet-full back to the element, so
+  // the stylesheet and this agree by construction. Reading them out of CSS is
+  // not an option: a custom property holding dvh comes back as the token
+  // "92dvh", not a pixel length, unless it is registered with @property.
+  function stops(){
+    const head = panel.querySelector('.panel-head');
+    const peek = Math.round(grip.offsetHeight + (head ? head.offsetHeight : 52) + 36);
+    const full = Math.round(Math.min(innerHeight * 0.92, 720));
+    return [Math.min(peek, full), Math.round(Math.min(innerHeight * 0.54, full)), full];
+  }
+
+  let height = null, drag = null;
+  // A drag that ends on the grip must not also toggle it. One-shot, and cleared
+  // on the next press too: Chrome suppresses the click after a long drag, and
+  // without that the flag would survive and eat the following tap.
+  let moved = 0, swallowClick = false;
+
+  function set(h, animate){
+    const [peek, , full] = stops();
+    height = Math.max(peek, Math.min(full, h));
+    panel.classList.toggle('dragging', !animate);
+    panel.style.setProperty('--sheet-full', full + 'px');
+    panel.style.setProperty('--sheet-h', height + 'px');
+    const open = height > peek + 4;
+    grip.setAttribute('aria-expanded', String(open));
+    grip.querySelector('.sr').textContent = open ? 'Collapse' : 'Expand';
+  }
+
+  function snap(velocity){
+    const list = stops();
+    // a flick beats proximity: past 0.45 px/ms, go the way the thumb was going
+    let target = list.reduce((a, b) => Math.abs(b - height) < Math.abs(a - height) ? b : a);
+    if (Math.abs(velocity) > 0.45){
+      const ordered = velocity > 0 ? list : [...list].reverse();
+      target = ordered.find(s => velocity > 0 ? s > height + 1 : s < height - 1) ?? target;
+    }
+    set(target, true);
+  }
+
+  function reset(){ if (isPhone()) set(stops()[0], false); }
+  function open(){ if (isPhone()) set(stops()[2], true); }
+  function toggle(){ const [peek, , full] = stops(); set(height > peek + 4 ? peek : full, true); }
+
+  function start(e, fromBody){
+    if (!isPhone()) return;
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    if (height === null) reset();
+    drag = { y: e.clientY, h: height, t: performance.now(), lastY: e.clientY, v: 0,
+             fromBody, id: e.pointerId };
+  }
+
+  panel.addEventListener('pointerdown', e => {
+    moved = 0; swallowClick = false;
+    if (e.target.closest('.grip, .panel-head')) start(e, false);
+    else {
+      const body = e.target.closest('.panel-body');
+      if (body && body.scrollTop <= 0) start(e, true);
+    }
+  });
+
+  /* The move and release listeners live on the window, not on the sheet.
+     Pointer capture is the usual answer, but capturing retargets the following
+     click to the capturing element, which kills tapping the grip - and
+     capturing lazily on first move does not work either, because the first move
+     of an upward drag is already above the sheet's edge, so the sheet never
+     sees it. Listening on the window sidesteps both. */
+  addEventListener('pointermove', e => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const dy = e.clientY - drag.y;
+    // from the body only a downward pull grabs the sheet; upward keeps scrolling,
+    // otherwise a swipe inside a list would close the sheet under the finger
+    if (drag.fromBody && dy < 0){ drag = null; return; }
+    moved = Math.max(moved, Math.abs(dy));
+    const now = performance.now();
+    if (now > drag.t) drag.v = (drag.lastY - e.clientY) / (now - drag.t);
+    drag.t = now; drag.lastY = e.clientY;
+    set(drag.h - dy, false);
+  }, { passive: true });
+
+  for (const ev of ['pointerup', 'pointercancel']){
+    addEventListener(ev, e => {
+      if (!drag || e.pointerId !== drag.id) return;
+      const v = drag.v;
+      drag = null;
+      swallowClick = moved > 8;
+      snap(v);
+    });
+  }
+
+  grip.addEventListener('click', e => {
+    e.preventDefault();
+    if (swallowClick){ swallowClick = false; return; }
+    toggle();
+  });
+  addEventListener('resize', () => { if (isPhone() && height !== null) set(height, false); });
+  matchMedia('(max-width:900px)').addEventListener('change', ev => {
+    if (ev.matches) reset();
+    else { panel.style.removeProperty('--sheet-h'); panel.style.removeProperty('--sheet-full'); height = null; }
+  });
+
+  return { open, toggle, reset, isPhone };
+})();
 
 $('#langBtn').addEventListener('click', () => {
   if (view === 'quote') captureForm();
@@ -479,8 +600,9 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && view !== 'quote') go('quote');
 });
 
-/* preload the next wallpaper so the crossfade never stutters */
-WALLS.forEach(w => { const i = new Image(); i.src = w.src; });
-
+/* No preload loop here: paintWall already attaches the next slide one ahead,
+   which is the fetch. Pulling all six would also pull the landscape set on a
+   phone, which never displays it - about two megabytes of nothing. */
 buildWall();
 render();
+sheet.reset();

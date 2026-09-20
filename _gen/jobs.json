@@ -2,7 +2,9 @@
   "style": {
     "product": "Photorealistic studio product photograph for an industrial packaging supplier's catalogue, landscape 3:2 framing. Seamless studio backdrop that is near-white at the top and graduates to a pale cool grey at the bottom, with one soft contact shadow under the subject. Lighting is a single large softbox from the upper left plus a gentle fill from the right, no hard speculars, no colour casts. Camera at a low three-quarter angle just above the product, 50mm lens look, everything in sharp focus, generous even margins, nothing cropped at the edges. Absolutely no text, no printed labels, no logos, no watermarks, no hands and no people. Subject:",
     "wall": "Photorealistic wide-angle photograph inside a large modern packaging distribution warehouse in Saudi Arabia, cinematic 16:9 landscape. Clean bright industrial space, high ceiling, pale concrete floor, daylight from high windows mixed with cool overhead LED, gentle haze and depth so the background falls softly out of focus. Composition keeps the LEFT THIRD of the frame calm and uncluttered - floor and empty space - with the main subject sitting in the centre-right of the frame. Rich natural colour, realistic grain, no text, no signage, no logos, no watermarks, no people. Scene:",
-    "wall_out": "Photorealistic wide-angle industrial photograph, cinematic 16:9 landscape, shot in Saudi Arabia in clear late-afternoon daylight with long soft shadows. Composition keeps the LEFT THIRD of the frame calm and uncluttered, with the main subject sitting in the centre-right of the frame. Rich natural colour, realistic grain, no text, no signage, no logos, no watermarks, no people. Scene:"
+    "wall_out": "Photorealistic wide-angle industrial photograph, cinematic 16:9 landscape, shot in Saudi Arabia in clear late-afternoon daylight with long soft shadows. Composition keeps the LEFT THIRD of the frame calm and uncluttered, with the main subject sitting in the centre-right of the frame. Rich natural colour, realistic grain, no text, no signage, no logos, no watermarks, no people. Scene:",
+    "wall_p": "Photorealistic vertical 9:16 portrait photograph inside a large modern packaging distribution warehouse in Saudi Arabia. Clean bright industrial space, high ceiling, pale concrete floor, daylight from high windows mixed with cool overhead LED, gentle haze and depth so the background falls softly out of focus. VERTICAL COMPOSITION: the subject's centre sits about 38% of the way down the tall frame, entirely above the halfway line, shot from a low standing eye level. The top of the frame is calm ceiling or open air, and the bottom third is clean, attractive floor with soft light across it - it is visible, so it must look good, not empty. Rich natural colour, realistic grain, no text, no signage, no logos, no watermarks, no people. Scene:",
+    "wall_out_p": "Photorealistic vertical 9:16 portrait photograph, shot in Saudi Arabia in clear late-afternoon daylight with long soft shadows. VERTICAL COMPOSITION: the subject's centre sits about 38% of the way down the tall frame, entirely above the halfway line, shot from a low standing eye level. The top of the frame is calm ceiling or open air, and the bottom third is clean, attractive floor with soft light across it - it is visible, so it must look good, not empty. Rich natural colour, realistic grain, no text, no signage, no logos, no watermarks, no people. Scene:"
   },
   "jobs": [
     {
@@ -93,6 +95,36 @@
     {
       "name": "w5",
       "style": "wall_out",
+      "prompt": "a large open yard stack of galvanised steel pipe bundles with blue plastic end caps, the bundles banded tightly with steel strapping and stacked in tiers, the cut ends of the pipes facing the camera in a dense honeycomb of circles."
+    },
+    {
+      "name": "w1-p",
+      "style": "wall_p",
+      "prompt": "a wooden pallet stacked with coils of polypropylene strapping in white, blue, red, yellow and grey, the coils neatly squared up, more wrapped pallets and stacks of plain brown cartons receding into the soft background."
+    },
+    {
+      "name": "w2-p",
+      "style": "wall_p",
+      "prompt": "a low stack of large deep-green PET strapping coils on a wooden pallet with one coil stood upright on top of the stack, staged in an aisle in front of tall steel racking loaded with more green coils."
+    },
+    {
+      "name": "w3-p",
+      "style": "wall_p",
+      "prompt": "a single very large coil of black machine-grade polypropylene strapping sitting on a pallet that has been wrapped in clear stretch film, the wound black band filling the subject, stacks of brown cartons behind a wire mesh cage in the soft background."
+    },
+    {
+      "name": "w6-p",
+      "style": "wall_p",
+      "prompt": "tall steel warehouse racking loaded bay after bay with green PET strapping coils standing on end, receding down the aisle, with one pallet of coils pulled out into the aisle in the foreground."
+    },
+    {
+      "name": "w4-p",
+      "style": "wall_out_p",
+      "prompt": "inside a shipping container being loaded, long bundles of dark steel pipe with bright blue plastic end caps laid down the length of the container, each bundle cinched tight with steel strapping bands, the corrugated container walls catching cool daylight from the open doors behind the camera."
+    },
+    {
+      "name": "w5-p",
+      "style": "wall_out_p",
       "prompt": "a large open yard stack of galvanised steel pipe bundles with blue plastic end caps, the bundles banded tightly with steel strapping and stacked in tiers, the cut ends of the pipes facing the camera in a dense honeycomb of circles."
     }
   ]

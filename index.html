@@ -7,16 +7,35 @@
 <meta name="description" content="Strapping, stretch film, tapes and protective packaging supplied across Riyadh, Dammam and Jeddah. Same-day delivery. Get a price in one message.">
 <meta name="theme-color" content="#2f3d4e">
 
+<meta name="robots" content="index, follow, max-image-preview:large">
+
+<!-- Link previews need ABSOLUTE urls - a relative og:image is simply dropped by
+     every scraper, which is why this link used to share without a thumbnail.
+     Change the four absolute urls below if the site moves to easypaksa.com. -->
+<link rel="canonical" href="https://digitaldotdeveloper.github.io/easypak-site/">
 <meta property="og:type" content="website">
+<meta property="og:site_name" content="EasyPak Trading Co.">
+<meta property="og:url" content="https://digitaldotdeveloper.github.io/easypak-site/">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="ar_SA">
 <meta property="og:title" content="EasyPak Trading Co. — Packaging Materials in Saudi Arabia">
-<meta property="og:description" content="Strapping, stretch film, tapes and protective packaging. Riyadh · Dammam · Jeddah. Same-day delivery.">
-<meta property="og:image" content="assets/wall/w1.jpg">
+<meta property="og:description" content="Strapping, stretch film, tapes and protective packaging. Riyadh · Dammam · Jeddah. Same-day delivery — get a price in one message.">
+<meta property="og:image" content="https://digitaldotdeveloper.github.io/easypak-site/assets/share.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="EasyPak Trading Co. — packaging materials. Riyadh, Dammam, Jeddah.">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="EasyPak Trading Co. — Packaging Materials in Saudi Arabia">
+<meta name="twitter:description" content="Strapping, stretch film, tapes and protective packaging. Riyadh · Dammam · Jeddah. Same-day delivery.">
+<meta name="twitter:image" content="https://digitaldotdeveloper.github.io/easypak-site/assets/share.jpg">
 
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=6">
+<link rel="stylesheet" href="styles.css?v=7">
 </head>
 
 <body>
@@ -30,7 +49,7 @@
 
     <header class="top">
       <a class="brand" href="#" data-go="quote" aria-label="EasyPak — home">
-        <img src="assets/logo.png?v=6" alt="EasyPak Trading Co." width="769" height="232">
+        <img src="assets/logo.png?v=7" alt="EasyPak Trading Co." width="769" height="232">
       </a>
 
       <div class="top-right">
@@ -44,8 +63,14 @@
       </div>
     </header>
 
-    <!-- the card -->
-    <section class="panel" id="panel" aria-live="polite"></section>
+    <!-- The card. On a phone this is a draggable bottom sheet: the grip is a real
+         button so it works by tap as well as by drag, and by keyboard. -->
+    <section class="panel" id="panel">
+      <button class="grip" id="grip" type="button" aria-controls="panelInner" aria-expanded="false">
+        <i aria-hidden="true"></i><span class="sr">Expand</span>
+      </button>
+      <div class="panel-inner" id="panelInner" aria-live="polite"></div>
+    </section>
 
     <!-- bottom-left nav -->
     <nav class="dock" id="dock"></nav>
@@ -101,6 +126,6 @@
   }
   </script>
 
-  <script src="app.js?v=6"></script>
+  <script src="app.js?v=7"></script>
 </body>
 </html>
