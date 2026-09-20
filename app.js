@@ -180,6 +180,14 @@ const $  = (s, r=document) => r.querySelector(s);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const T  = () => STR[lang];
 
+/* GitHub Pages serves everything with max-age=600 and the filenames never
+   change, so a browser that has seen the site keeps the old stylesheet and the
+   old photographs for ten minutes or more - long enough to look like a deploy
+   that did not work. Bump V on every deploy; index.html carries the same token
+   on styles.css, app.js and the logo. */
+const V = '5';
+const v = url => `${url}?v=${V}`;
+
 /* ── wallpaper engine ───────────────────────────────────── */
 
 function buildWall(){
@@ -197,7 +205,7 @@ function paintWall(i){
   const fig = $('#wall').children[i];
   if (!fig || fig.dataset.painted) return;
   fig.dataset.painted = '1';
-  fig.style.setProperty('--w', `url('${WALLS[i].src}')`);
+  fig.style.setProperty('--w', `url('${v(WALLS[i].src)}')`);
 }
 
 function showWall(i){
@@ -306,7 +314,7 @@ function viewCatalogue(){
     <p class="lead">${esc(t.catLead)}</p>
     <div class="grid">
       ${slice.map(p => `<button class="tile" type="button" data-pick="${p.id}">
-        <span class="tile-img" style="background-image:url('assets/products/${p.img}.jpg')"></span>
+        <span class="tile-img" style="background-image:url('${v(`assets/products/${p.img}.jpg`)}')"></span>
         <span class="tile-txt"><b>${esc(p[lang][0])}</b><span>${esc(p[lang][1])}</span></span>
       </button>`).join('')}
     </div>

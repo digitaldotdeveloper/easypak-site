@@ -77,6 +77,12 @@ photograph of roof beams. On a phone the frame is now laid into that band whole.
 
 ## Deploying
 
+**Bump `V` in `app.js` and the three `?v=` tokens in `index.html` on every
+deploy.** GitHub Pages serves everything with `Cache-Control: max-age=600` and
+the filenames never change, so without it a browser that has already seen the
+site keeps the old stylesheet and the old photographs for ten minutes or more —
+which looks exactly like a deploy that did not work.
+
 The repository is static, so GitHub Pages serves it as-is from `main` — that is what
 <https://digitaldotdeveloper.github.io/easypak-site/> is. To put it on the real domain
 instead, drop the folder into the web root — or add a `CNAME` file containing
