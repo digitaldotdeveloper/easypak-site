@@ -35,7 +35,8 @@ styles.css        the whole design system (colours sampled from the EasyPak logo
 app.js            content, both languages, view rendering, wallpaper engine
 assets/wall/      six wallpapers
 assets/products/  twelve catalogue images
-assets/logo.png   the EasyPak wordmark, cut out to transparent
+assets/logo.png   the wordmark, white knockout on transparent (for photography)
+assets/logo-dark.png  the same mark in brand colours, for light backgrounds
 _gen/             the image recipe (prompts + the script that renders them)
 tools/shot.js     CDP screenshots at true device sizes
 ```

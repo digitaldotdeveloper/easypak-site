@@ -150,9 +150,10 @@ html[dir="rtl"] .wall-veil{
 .top{ grid-area:top; display:flex; align-items:center; justify-content:space-between; gap:20px; }
 
 .brand img{
-  display:block; height:44px; width:auto;
-  background:#fff; padding:8px 14px; border-radius:var(--r-sm);
-  box-shadow:0 6px 18px rgba(10,16,24,.28);
+  /* The white knockout sits straight on the photograph - no plate. The shadow
+     is what keeps it off a bright frame; the veil does the rest. */
+  display:block; height:46px; width:auto;
+  filter:drop-shadow(0 2px 5px rgba(8,14,22,.55)) drop-shadow(0 8px 22px rgba(8,14,22,.35));
 }
 
 .top-right{ display:flex; align-items:center; gap:10px; }
@@ -183,7 +184,10 @@ html[dir="rtl"] .wall-veil{
   overflow:hidden;
   display:flex; flex-direction:column;
   position:relative;
-  max-height:calc(100dvh - (var(--gut) * 2) - 112px);
+  /* 142px, not 112: the card is centred in its grid row and overruns it when it
+     is taller, which put its top edge over the wordmark once the logo lost its
+     plate. This keeps it clear of the header. */
+  max-height:calc(100dvh - (var(--gut) * 2) - 142px);
 }
 
 .panel::after{
@@ -409,7 +413,7 @@ html[dir="rtl"] .arrow svg{ transform:scaleX(-1); }
   }
   .stage.wide{ grid-template-columns:1fr; }
 
-  .brand img{ height:34px; padding:7px 11px; }
+  .brand img{ height:34px; }
   .pill{ height:34px; padding:0 12px; font-size:12.5px; }
   .pill-ghost span{ display:none; }
 
