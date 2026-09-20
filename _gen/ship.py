@@ -1,10 +1,17 @@
 """Turn the raw Gemini PNGs in _gen/out into the JPEGs the site actually loads.
 
-Products keep their native 1024 px long edge (the catalogue tile is ~250 px, so
-that is already four times what the screen asks for) and are cropped to the
-3:2 the tile crops to anyway.  Wallpapers are full-bleed behind a heavy veil,
-so they are cropped to 16:9 and taken up to 1920 px with Lanczos plus a mild
-unsharp - the native 1024 would visibly soften under the ken-burns zoom.
+Gemini caps the long edge at 1024 px - asking for 2K or 4K in the prompt changes
+nothing, it was measured - so the only real lever on quality is to stop wasting
+those pixels on a crop.  That is a stylesheet job on the phone, where the frame
+is now laid into the visible band whole instead of being cropped to a quarter of
+its width; here it just means not resampling anything that does not need it.
+
+Products ship at their native size: the catalogue tile is ~190 px on desktop and
+~165 px on a phone, so 1024 is already several times what any screen asks for and
+resampling up would only add a generation of loss.  The wallpapers do have to be
+enlarged - they run full-bleed under a ken-burns zoom - so they get Lanczos plus
+a two-radius unsharp: a tight pass for edge detail and a wide, gentle one for the
+local contrast that makes an enlargement read as sharp rather than merely hard.
 """
 import sys
 from pathlib import Path
@@ -28,32 +35,30 @@ def crop_to(im, ratio):
     return im.crop(box)
 
 
+def enlarge(im, size):
+    im = im.resize(size, Image.LANCZOS)
+    im = im.filter(ImageFilter.UnsharpMask(radius=1.0, percent=70, threshold=2))
+    return im.filter(ImageFilter.UnsharpMask(radius=3.0, percent=22, threshold=3))
+
+
 def ship(name, kind):
     src = OUT / f"{name}.png"
     if not src.exists():
         print(f"  MISSING {name}")
-        return False
+        return
     im = Image.open(src).convert("RGB")
     if kind == "product":
-        im = crop_to(im, 3 / 2).resize((1200, 800), Image.LANCZOS)
-        im = im.filter(ImageFilter.UnsharpMask(radius=1.0, percent=45, threshold=3))
-        dest, q = SITE / "assets" / "products" / f"{name}.jpg", 88
+        im, dest, q = crop_to(im, 3 / 2), SITE / "assets" / "products" / f"{name}.jpg", 92
     else:
-        im = crop_to(im, 16 / 9).resize((1920, 1080), Image.LANCZOS)
-        im = im.filter(ImageFilter.UnsharpMask(radius=1.4, percent=65, threshold=3))
-        dest, q = SITE / "assets" / "wall" / f"{name}.jpg", 84
+        im = enlarge(crop_to(im, 16 / 9), (1920, 1080))
+        dest, q = SITE / "assets" / "wall" / f"{name}.jpg", 86
     dest.parent.mkdir(parents=True, exist_ok=True)
     im.save(dest, "JPEG", quality=q, optimize=True, progressive=True)
     print(f"  {name:10s} {im.size[0]}x{im.size[1]}  {dest.stat().st_size // 1024} KB")
-    return True
 
 
 only = sys.argv[1].split(",") if len(sys.argv) > 1 else None
-print("products")
-for n in PRODUCTS:
+plan = [(n, "product") for n in PRODUCTS] + [(n, "wall") for n in WALLS]
+for n, kind in plan:
     if not only or n in only:
-        ship(n, "product")
-print("wallpapers")
-for n in WALLS:
-    if not only or n in only:
-        ship(n, "wall")
+        ship(n, kind)

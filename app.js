@@ -184,13 +184,26 @@ const T  = () => STR[lang];
 
 function buildWall(){
   const wall = $('#wall');
-  wall.innerHTML = WALLS.map(w => `<figure style="background-image:url('${w.src}')"></figure>`).join('');
+  wall.innerHTML = WALLS.map(() => '<figure></figure>').join('');
   $('#wallDots').innerHTML = WALLS.map(() => '<i></i>').join('');
   showWall(0);
 }
 
+// Attached one slide ahead rather than all six up front: six full-bleed
+// photographs is a slow first screen on a phone, and five of them are not on it
+// yet. The figure takes its image from --w so the stylesheet can lay the same
+// frame out differently on a phone without app.js knowing about it.
+function paintWall(i){
+  const fig = $('#wall').children[i];
+  if (!fig || fig.dataset.painted) return;
+  fig.dataset.painted = '1';
+  fig.style.setProperty('--w', `url('${WALLS[i].src}')`);
+}
+
 function showWall(i){
   wallIx = (i + WALLS.length) % WALLS.length;
+  paintWall(wallIx);
+  paintWall((wallIx + 1) % WALLS.length);
   const figs = $('#wall').children;
   for (let k = 0; k < figs.length; k++) figs[k].classList.toggle('on', k === wallIx);
   const dots = $('#wallDots').children;

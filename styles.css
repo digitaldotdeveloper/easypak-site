@@ -60,6 +60,7 @@ a{ color:inherit; text-decoration:none; }
 
 .wall figure{
   position:absolute; inset:0; margin:0;
+  background-image:var(--w);
   background-size:cover; background-position:center 46%;
   opacity:0;
   transform:scale(1.02);
@@ -72,9 +73,26 @@ a{ color:inherit; text-decoration:none; }
 }
 @keyframes kb{ from{ transform:scale(1.02); } to{ transform:scale(1.085); } }
 
-/* Every wallpaper is composed with its subject centre-right and the left third
-   left calm, because that is where the card sits. In Arabic the card mirrors to
-   the right, so the photograph mirrors with it. */
+/* On a phone the card is a sheet 620px tall pinned to the bottom, so only the top
+   224px of this element is ever seen - and that visible window is landscape, not
+   portrait. Covering the whole 390x844 element cropped the 16:9 frame to a
+   quarter of its width and enlarged it nearly threefold, which is how a
+   photograph of a pallet became a photograph of roof beams. So on a phone the
+   frame is laid into that band whole, at a little over full width, and the deep
+   slate of .wall fills everything underneath - which the sheet covers anyway. */
+@media (max-aspect-ratio:4/5){
+  .wall figure{
+    background-size:108% auto;
+    background-position:center top;
+    background-repeat:no-repeat;
+    transform:none;
+  }
+  .wall figure.on{ animation:none; }
+}
+
+/* Every landscape wallpaper is composed with its subject centre-right and the
+   left third left calm, because that is where the card sits. In Arabic the card
+   mirrors to the right, so the photograph mirrors with it. */
 html[dir="rtl"] .wall figure{ transform:scale(1.02) scaleX(-1); }
 html[dir="rtl"] .wall figure.on{ animation-name:kb-rtl; }
 @keyframes kb-rtl{ from{ transform:scale(1.02) scaleX(-1); } to{ transform:scale(1.085) scaleX(-1); } }
@@ -89,6 +107,24 @@ html[dir="rtl"] .wall-veil{
   background:
     linear-gradient(260deg, rgba(20,28,38,.80) 0%, rgba(20,28,38,.52) 38%, rgba(20,28,38,.10) 62%, rgba(20,28,38,.42) 100%),
     linear-gradient(to top, rgba(20,28,38,.62) 0%, rgba(20,28,38,0) 42%);
+}
+
+/* On a phone the card is a sheet at the bottom and the chrome sits at the top,
+   so the veil turns through 90 degrees. It has to come after the RTL rule above,
+   which is the more specific selector and would otherwise win in Arabic. */
+@media (max-aspect-ratio:4/5){
+  .wall-veil, html[dir="rtl"] .wall-veil{
+    background:
+      linear-gradient(to bottom, rgba(20,28,38,.58) 0%, rgba(20,28,38,.14) 34%, rgba(20,28,38,.34) 62%, rgba(20,28,38,.55) 100%);
+  }
+}
+
+/* The Arabic mirror is a landscape-layout fix - it moves the subject away from a
+   card that sits on one side. On a phone the sheet is at the bottom instead, so
+   there is nothing to move away from and flipping would only undo the framing. */
+@media (max-aspect-ratio:4/5){
+  html[dir="rtl"] .wall figure{ transform:none; }
+  html[dir="rtl"] .wall figure.on{ animation:none; }
 }
 
 /* ── stage ──────────────────────────────────────────────── */
@@ -114,8 +150,8 @@ html[dir="rtl"] .wall-veil{
 .top{ grid-area:top; display:flex; align-items:center; justify-content:space-between; gap:20px; }
 
 .brand img{
-  display:block; height:38px; width:auto;
-  background:#fff; padding:7px 13px; border-radius:var(--r-sm);
+  display:block; height:44px; width:auto;
+  background:#fff; padding:8px 14px; border-radius:var(--r-sm);
   box-shadow:0 6px 18px rgba(10,16,24,.28);
 }
 
@@ -373,7 +409,7 @@ html[dir="rtl"] .arrow svg{ transform:scaleX(-1); }
   }
   .stage.wide{ grid-template-columns:1fr; }
 
-  .brand img{ height:28px; padding:6px 10px; }
+  .brand img{ height:34px; padding:7px 11px; }
   .pill{ height:34px; padding:0 12px; font-size:12.5px; }
   .pill-ghost span{ display:none; }
 
@@ -386,9 +422,18 @@ html[dir="rtl"] .arrow svg{ transform:scaleX(-1); }
   .panel-body{ padding:20px 20px calc(22px + env(safe-area-inset-bottom)); }
   .h1{ font-size:22px; }
 
-  .dock{ overflow-x:auto; flex-wrap:nowrap; padding-bottom:4px; scrollbar-width:none; }
+  .dock{ overflow-x:auto; flex-wrap:nowrap; padding-bottom:4px; scrollbar-width:none; gap:7px; }
   .dock::-webkit-scrollbar{ display:none; }
-  .dock button{ white-space:nowrap; }
+  /* On the wide layout these are bare words in the margin. On a phone they sit in
+     the middle of the photograph with nothing behind them, so they become chips. */
+  .dock button{
+    white-space:nowrap; color:#fff; font-size:12.5px; padding:8px 14px;
+    background:rgba(18,26,36,.46); border:1px solid rgba(255,255,255,.26);
+    backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+  }
+  .dock button[aria-current="true"]{
+    background:var(--lime); border-color:var(--lime); color:var(--slate-deep);
+  }
 
   .meta{ display:none; }
   .grid{ grid-template-columns:repeat(2,1fr); gap:11px; }

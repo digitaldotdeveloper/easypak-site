@@ -35,7 +35,7 @@ styles.css        the whole design system (colours sampled from the EasyPak logo
 app.js            content, both languages, view rendering, wallpaper engine
 assets/wall/      six wallpapers
 assets/products/  twelve catalogue images
-assets/logo.png   the EasyPak wordmark
+assets/logo.png   the EasyPak wordmark, cut out to transparent
 _gen/             the image recipe (prompts + the script that renders them)
 tools/shot.js     CDP screenshots at true device sizes
 ```
@@ -54,13 +54,25 @@ wallpapers — which is the whole reason the catalogue grid looks even.
 ```
 GS_TOKEN=… node _gen/gen.mjs         render anything missing from _gen/out/
 python _gen/ship.py [name,name]      crop, resize and write assets/
+python _gen/logo.py                  cut the wordmark off its white background
 ```
 
 `gen.mjs` skips whatever is already in `_gen/out/`, so it doubles as the retry pass: delete
-the one frame you dislike, re-run, re-ship. Gemini caps the long edge at 1024 px, so
-`ship.py` crops the products to the 3:2 their tile wants and takes the wallpapers to
-1920 × 1080 with Lanczos and a light unsharp — they run full-bleed under a ken-burns zoom,
-where the native size visibly softens.
+the one frame you dislike, re-run, re-ship.
+
+**Gemini caps the long edge at 1024 px.** Asking for 2K or 4K in the prompt changes nothing
+— it was measured both ways — so the only lever on quality is to stop wasting those pixels.
+Products therefore ship at their native size and are never resampled up: the catalogue tile
+is about 190 px on desktop and 165 px on a phone, so 1024 is already several times what any
+screen asks for. Only the wallpapers are enlarged, because they run full-bleed, and they get
+Lanczos plus a two-radius unsharp — a tight pass for edge detail and a wide gentle one for
+the local contrast that makes an enlargement read as sharp rather than merely hard.
+
+The same arithmetic is why the phone layout changed. The card is a 620 px sheet pinned to
+the bottom, so only the top 224 px of the wallpaper is ever visible — and that window is
+landscape. Covering the full 390 × 844 element cropped the 16:9 frame to a quarter of its
+width and enlarged it almost threefold, which is how a photograph of a pallet became a
+photograph of roof beams. On a phone the frame is now laid into that band whole.
 
 ## Deploying
 
